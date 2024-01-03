@@ -1,0 +1,17 @@
+{
+  "requires": {
+    "auth": {
+      "kind": "basic",
+      "users": {
+        "manager": {
+          "password": "123",
+          "roles": [ "PurchaseOrderManager", "FreightVendorManager" ]
+        },
+        "viewer": {
+          "password": "123",
+          "roles": [ "PurchaseOrderViewer", "FreightVendorViewer" ]
+        }
+      }
+    }
+  }
+}

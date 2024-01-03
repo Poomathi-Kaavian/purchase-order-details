@@ -1,0 +1,110 @@
+_schema-version: '3.1'
+ID: purchase-order-details
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npx cds build --production
+modules:
+  - name: purchase-order-details-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: purchase-order-details-auth
+      - name: purchase-order-details-db
+      - name: purchase-order-details-destination
+      - name: purchase-order-details-connectivity
+
+  - name: purchase-order-details
+    type: approuter.nodejs
+    path: app/
+    parameters:
+      keep-existing-routes: true
+      disk-quota: 512M
+      memory: 512M
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api # must be used in xs-app.json as well
+          url: ~{srv-url}
+          forwardAuthToken: true
+      - name: purchase-order-details-auth
+
+  - name: purchase-order-details-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: purchase-order-details-db
+
+resources:
+  - name: purchase-order-details-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: purchase-order-details-${org}-${space}
+        tenant-mode: dedicated
+        role-collections:
+        - name: 'PurchaseOrderManager-${org}-${space}'
+          description: PurchaseOrderManager
+          role-template-references:
+          - $XSAPPNAME.PurchaseOrderManager
+        - name: 'PurchaseOrderViewer-${org}-${space}'
+          description: PurchaseOrderViewer
+          role-template-references:
+          - $XSAPPNAME.PurchaseOrderViewer
+        - name: 'FreightVendorViewer-${org}-${space}'
+          description: FreightVendorViewer
+          role-template-references:
+          - $XSAPPNAME.FreightVendorViewer
+        - name: 'FreightVendorManager-${org}-${space}'
+          description: FreightVendorManager
+          role-template-references:
+          - $XSAPPNAME.FreightVendorManager
+        oauth2-configuration:
+          redirect-uris:
+            - https://3f626dfftrial-dev-purchase-order-details.cfapps.us10-001.hana.ondemand.com/login/callback
+  - name: purchase-order-details-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: purchase-order-details-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+            - Authentication: NoAuthentication
+              Name: ui5
+              ProxyType: Internet
+              Type: HTTP
+              URL: https://ui5.sap.com
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-plan: lite
+  - name: purchase-order-details-connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite

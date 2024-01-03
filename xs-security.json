@@ -1,0 +1,55 @@
+{
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.PurchaseOrderViewer",
+      "description": "PurchaseOrderViewer"
+    },
+    {
+      "name": "$XSAPPNAME.PurchaseOrderManager",
+      "description": "PurchaseOrderManager"
+    },
+    {
+      "name": "$XSAPPNAME.FreightVendorViewer",
+      "description": "FreightVendorViewer"
+    },
+    {
+      "name": "$XSAPPNAME.FreightVendorManager",
+      "description": "FreightVendorManager"
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "PurchaseOrderViewer",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.PurchaseOrderViewer"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "PurchaseOrderManager",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.PurchaseOrderManager"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "FreightVendorViewer",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.FreightVendorViewer"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "FreightVendorManager",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.FreightVendorManager"
+      ],
+      "attribute-references": []
+    }
+  ]
+}
