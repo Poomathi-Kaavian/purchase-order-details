@@ -130,7 +130,7 @@ annotate service.Books with @(
         },
         {
             $Type : 'UI.CollectionFacet',
-            Label : 'Freight Vendor Drtails',
+            Label : '{i18n>FreightVendorDetails}',
             ID : 'FreightVendorDrtails',
             Facets : [
                 {
